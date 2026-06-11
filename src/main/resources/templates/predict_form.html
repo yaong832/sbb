@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+<section class="container my-3">
+    <h2>신규 장비 데이터 추론</h2>
+    <p class="desc">학습된 정상 평균 기준과 신규 센서 값을 비교하여 NORMAL 또는 ABNORMAL을 판정합니다</p>
+	<form th:action="@{/predict/run}" method="post" class="form-box">	
+		<label class="form-label">장비명</label>
+		<input class="form-control" name="equipmentName" value="Etcher-01">
+		<label class="form-label">온도</label>
+		<input class="form-control" type="number" step="0.1" name="temperature" value="95.0">
+		<label class="form-label">압력</label>
+		<input class="form-control" type="number" step="0.1" name="pressure" value="4.8">
+		<label class="form-label">진동</label>
+		<input class="form-control" type="number" step="0.1" name="vibration" value="1.6">
+		<label class="form-label">가스 유량</label>
+		<input class="form-control" type="number" step="0.1" name="gasFlow" value="190.0">
+        <button class="btn btn-primary" type="submit">추론 실행</button>
+    </form>
+</section>
+</html>

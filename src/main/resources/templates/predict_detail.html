@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout(~{::section})}">
+
+<section class="container my-3">
+
+    <h2>추론 결과 상세</h2>
+
+    <div th:class="${result.result == 'NORMAL'} ? 'result-card normal-box' : 'result-card abnormal-box'">
+        <h3 th:text="${result.result}"></h3>
+        <p>위험 점수: <strong th:text="${result.riskScore}"></strong></p>
+        <p th:text="${result.reason}"></p>
+    </div>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>장비명</th>
+            <td th:text="${result.equipmentName}"></td>
+        </tr>
+        <tr>
+            <th>온도</th>
+            <td th:text="${result.temperature}"></td>
+        </tr>
+        <tr>
+            <th>압력</th>
+            <td th:text="${result.pressure}"></td>
+        </tr>
+        <tr>
+            <th>진동</th>
+            <td th:text="${result.vibration}"></td>
+        </tr>
+        <tr>
+            <th>가스 유량</th>
+            <td th:text="${result.gasFlow}"></td>
+        </tr>
+        <tr>
+            <th>추론 일시</th>
+            <td th:text="${#temporals.format(result.predictDate, 'yyyy-MM-dd HH:mm')}"></td>
+        </tr>
+    </table>
+
+    <h3>사용자 피드백</h3>
+
+    <form th:action="@{|/predict/feedback/${result.id}|}" method="post" class="form-box">
+
+        <select class="form-select" name="userFeedback">
+            <option value="정확함">정확함</option>
+            <option value="부정확함">부정확함</option>
+        </select>
+
+        <textarea class="form-control"
+                  name="feedbackMemo"
+                  placeholder="판정 결과에 대한 의견을 입력하세요."></textarea>
+
+        <button class="btn btn-primary" type="submit">
+            피드백 저장
+        </button>
+
+    </form>
+
+    <p th:if="${result.userFeedback != null}" class="memo">
+        저장된 피드백:
+        <strong th:text="${result.userFeedback}"></strong>
+        /
+        <span th:text="${result.feedbackMemo}"></span>
+    </p>
+
+</section>
+
+</html>

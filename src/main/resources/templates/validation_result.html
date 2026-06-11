@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::section})}">
+	<section class="container my-3">
+		<h2>모델 검증 결과</h2>
+		<div class="btn-area"><a class="btn btn-warning" th:href="@{/validation/run}">검증 실행</a></div>
+		<div th:if="${validationResult == null}" class="empty">아직 검증 결과가 없습니다. 검증 실행 버튼을 눌러주세요.</div>
+		<table class="table table-bordered" th:if="${validationResult != null}">
+			<tr><th>전체 데이터 수</th><td th:text="${validationResult.totalCount}"></td></tr>
+			<tr><th>맞춘 개수</th><td th:text="${validationResult.correctCount}"></td></tr>
+			<tr><th>틀린 개수</th><td th:text="${validationResult.wrongCount}"></td></tr>
+			<tr><th>정확도</th><td th:text="|${#numbers.formatDecimal(validationResult.accuracy, 1, 2)} %|"></td></tr>
+			<tr><th>검증 일시</th><td th:text="${#temporals.format(validationResult.validationDate, 'yyyy-MM-dd HH:mm')}"></td></tr>
+		</table>
+	</section>
+</html>
