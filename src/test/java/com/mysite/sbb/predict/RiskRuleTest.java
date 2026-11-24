@@ -3,6 +3,7 @@ package com.mysite.sbb.predict;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import com.mysite.sbb.model.ModelInfo;
@@ -20,7 +21,8 @@ class RiskRuleTest {
     }
 
     @Test
-    void 모든_값이_평균에_가까우면_정상() {
+    @DisplayName("모든 값이 평균에 가까우면 정상, 0점")
+    void allNearAverageIsNormal() {
         RiskRule.Result result = RiskRule.evaluate(72.5, 5.0, 0.5, 117.0, model());
 
         assertEquals(0, result.score());
@@ -29,7 +31,8 @@ class RiskRuleTest {
     }
 
     @Test
-    void 가스_유량만_벗어나도_이상() {
+    @DisplayName("가스 유량만 벗어나도 이상 (가스 300, 평균 117)")
+    void gasFlowAloneIsAbnormal() {
         RiskRule.Result result = RiskRule.evaluate(72.5, 5.0, 0.5, 300.0, model());
 
         assertEquals(20, result.score());
@@ -38,7 +41,8 @@ class RiskRuleTest {
     }
 
     @Test
-    void 온도만_벗어나면_이상() {
+    @DisplayName("온도만 벗어나면 이상")
+    void temperatureAloneIsAbnormal() {
         RiskRule.Result result = RiskRule.evaluate(95.0, 5.0, 0.5, 117.0, model());
 
         assertEquals(30, result.score());
@@ -46,7 +50,8 @@ class RiskRuleTest {
     }
 
     @Test
-    void 압력만_벗어나면_이상() {
+    @DisplayName("압력만 벗어나면 이상")
+    void pressureAloneIsAbnormal() {
         RiskRule.Result result = RiskRule.evaluate(72.5, 7.0, 0.5, 117.0, model());
 
         assertEquals(25, result.score());
@@ -54,7 +59,8 @@ class RiskRuleTest {
     }
 
     @Test
-    void 진동만_벗어나면_이상() {
+    @DisplayName("진동만 벗어나면 이상")
+    void vibrationAloneIsAbnormal() {
         RiskRule.Result result = RiskRule.evaluate(72.5, 5.0, 1.5, 117.0, model());
 
         assertEquals(25, result.score());
@@ -62,7 +68,8 @@ class RiskRuleTest {
     }
 
     @Test
-    void 허용_범위와_딱_같은_차이는_정상() {
+    @DisplayName("허용 범위와 딱 같은 차이는 정상")
+    void exactlyAtRangeIsNormal() {
         // 차이가 허용 범위와 같으면 '벗어남'이 아님 (초과일 때만 점수)
         RiskRule.Result result = RiskRule.evaluate(87.5, 6.5, 1.3, 157.0, model());
 
@@ -71,7 +78,8 @@ class RiskRuleTest {
     }
 
     @Test
-    void 네_항목이_모두_벗어나면_100점() {
+    @DisplayName("네 항목이 모두 벗어나면 100점")
+    void allFourOutOfRangeScores100() {
         RiskRule.Result result = RiskRule.evaluate(50.0, 2.0, 2.0, 10.0, model());
 
         assertEquals(100, result.score());
