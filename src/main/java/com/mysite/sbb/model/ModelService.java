@@ -8,6 +8,8 @@ import java.util.Optional;
 // Spring Service import
 import org.springframework.stereotype.Service;
 // SensorData 관련 import
+//준비 안 됨 예외 import
+import com.mysite.sbb.NotReadyException;
 import com.mysite.sbb.sensor.SensorData;
 import com.mysite.sbb.sensor.SensorDataService;
 
@@ -26,7 +28,8 @@ public class ModelService {
 		List<SensorData> normalDataList = this.sensorDataService.getNormalData();
 		
 		if (normalDataList.isEmpty()) {
-			throw new RuntimeException("정상 학습 데이터가 없습니다.");
+			throw new NotReadyException("정상(NORMAL) 학습 데이터가 없습니다. 학습 데이터를 먼저 만들어 주세요.",
+					"/sensor/list", "학습 데이터로 가기");
 		}
 		
 		double avgTemperature = normalDataList.stream().mapToDouble(SensorData::getTemperature).average().orElse(0);
@@ -50,6 +53,7 @@ public class ModelService {
 	}
 	public ModelInfo getLatestModel() {
 	    return this.modelInfoRepository.findTopByOrderByIdDesc()
-	            .orElseThrow(() -> new RuntimeException("학습된 모델이 없습니다."));
+	            .orElseThrow(() -> new NotReadyException("학습된 모델이 없습니다. 모델 학습을 먼저 실행해 주세요.",
+	                    "/model/info", "학습 결과로 가기"));
 	}
 }
