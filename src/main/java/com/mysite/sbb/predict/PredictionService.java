@@ -46,7 +46,7 @@ public class PredictionService {
         PredictionResult result = makePrediction(equipmentName, temperature, pressure, vibration, gasFlow, model);
         PredictionResult saved = this.predictionResultRepository.save(result);
 
-        if ("ABNORMAL".equals(saved.getResult())) {
+        if (RiskRule.ABNORMAL.equals(saved.getResult())) {
             this.equipmentAlarmService.createAuto(equipmentName, saved.getReason(), saved.getId());
         }
 
@@ -56,34 +56,7 @@ public class PredictionService {
     public PredictionResult makePrediction(String equipmentName, Double temperature, Double pressure,
                                            Double vibration, Double gasFlow, ModelInfo model) {
 
-        int score = 0;
-        StringBuilder reason = new StringBuilder();
-
-        if (Math.abs(temperature - model.getAvgTemperature()) > 15) {
-            score += 30;
-            reason.append("온도가 정상 평균에서 크게 벗어났습니다. ");
-        }
-
-        if (Math.abs(pressure - model.getAvgPressure()) > 1.5) {
-            score += 25;
-            reason.append("압력이 정상 평균에서 크게 벗어났습니다. ");
-        }
-
-        if (Math.abs(vibration - model.getAvgVibration()) > 0.8) {
-            score += 25;
-            reason.append("진동 값이 정상 평균에서 크게 벗어났습니다. ");
-        }
-
-        if (Math.abs(gasFlow - model.getAvgGasFlow()) > 40) {
-            score += 20;
-            reason.append("가스 유량이 정상 평균에서 크게 벗어났습니다. ");
-        }
-
-        String finalResult = score >= 25 ? "ABNORMAL" : "NORMAL";
-
-        if (reason.length() == 0) {
-            reason.append("정상 값과 데이터의 평균 기준에 가깝습니다.");
-        }
+        RiskRule.Result rule = RiskRule.evaluate(temperature, pressure, vibration, gasFlow, model);
 
         PredictionResult predictionResult = new PredictionResult();
         predictionResult.setEquipmentName(equipmentName);
@@ -91,9 +64,9 @@ public class PredictionService {
         predictionResult.setPressure(pressure);
         predictionResult.setVibration(vibration);
         predictionResult.setGasFlow(gasFlow);
-        predictionResult.setResult(finalResult);
-        predictionResult.setRiskScore(score);
-        predictionResult.setReason(reason.toString());
+        predictionResult.setResult(rule.label());
+        predictionResult.setRiskScore(rule.score());
+        predictionResult.setReason(rule.reason());
         predictionResult.setPredictDate(LocalDateTime.now());
 
         return predictionResult;

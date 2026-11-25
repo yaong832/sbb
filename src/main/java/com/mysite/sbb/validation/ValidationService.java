@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 //모델 정보 import
 import com.mysite.sbb.model.ModelInfo;
 import com.mysite.sbb.model.ModelService;
+//판정 규칙 import
+import com.mysite.sbb.predict.RiskRule;
 //센서 데이터 import
 import com.mysite.sbb.sensor.SensorData;
 import com.mysite.sbb.sensor.SensorDataService;
@@ -61,15 +63,9 @@ public class ValidationService {
     }
 
     private String predictLabel(SensorData data, ModelInfo model) {
-
-        int score = 0;
-
-        if (Math.abs(data.getTemperature() - model.getAvgTemperature()) > 15) score += 30;
-        if (Math.abs(data.getPressure() - model.getAvgPressure()) > 1.5) score += 25;
-        if (Math.abs(data.getVibration() - model.getAvgVibration()) > 0.8) score += 25;
-        if (Math.abs(data.getGasFlow() - model.getAvgGasFlow()) > 40) score += 20;
-
-        return score >= 25 ? "ABNORMAL" : "NORMAL";
+        // 추론 화면과 같은 판정 규칙을 사용
+        return RiskRule.evaluate(data.getTemperature(), data.getPressure(),
+                data.getVibration(), data.getGasFlow(), model).label();
     }
 
     public Optional<ValidationResult> getLatestResultOptional() {
